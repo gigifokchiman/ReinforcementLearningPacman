@@ -4,6 +4,8 @@ by Pacman agents (in searchAgents.py).
 """
 
 import util
+import collections
+from heapq import heappush, heappop
 
 class SearchProblem:
     """
@@ -73,7 +75,28 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    frontier = collections.deque()
+    frontier.append((problem.getStartState(), []))
+    exploredSet = set()
+
+    while frontier:
+        node = frontier.pop()
+
+        if problem.isGoalState(node[0]):
+            return node[1]
+
+        if node[0] not in exploredSet:
+            # print('Exploring:', node[0], '...')
+            exploredSet.add(node[0])
+
+            for child in problem.getSuccessors(node[0]):
+                frontier.append((child[0], node[1] + [child[1]]))
+
+        # print(list(frontier))
+        # print(exploredSet)
+
+    # util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """
@@ -81,13 +104,50 @@ def breadthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
 
+    frontier = collections.deque()
+    frontier.append((problem.getStartState(), []))
+    exploredSet = set()
+
+    while frontier:
+        node = frontier.popleft()
+
+        if problem.isGoalState(node[0]):
+            return node[1]
+
+        if node[0] not in exploredSet:
+            # print('Exploring:', node[0], '...')
+            exploredSet.add(node[0])
+
+            for child in problem.getSuccessors(node[0]):
+                frontier.append((child[0], node[1] + [child[1]]))
+
+        # print(list(frontier))
+        # print(exploredSet)v
     
     # util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     "Search the node of least total cost first. "
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    frontier = []
+    heappush(frontier, (0, [], problem.getStartState()))
+    exploredSet = set()
+
+    while frontier:
+        node = heappop(frontier)
+        if problem.isGoalState(node[2]):
+            return node[1]
+
+        if node[2] not in exploredSet:
+            # print('Exploring:', node[1], 'at cost', node[0])
+            exploredSet.add(node[2])
+            for child in problem.getSuccessors(node[2]):
+                heappush(frontier, (node[0]+child[2], node[1]+[child[1]], child[0]))
+
+            # print(list(frontier))
+            # print(exploredSet)
+    # util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
     """
@@ -99,7 +159,27 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     "Search the node that has the lowest combined cost and heuristic first."
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    frontier = []
+    heappush(frontier, (heuristic(problem.getStartState(), problem),  [], problem.getStartState()))
+    exploredSet = set()
+
+    while frontier:
+        node = heappop(frontier)
+        if problem.isGoalState(node[2]):
+            return node[1]
+
+        if node[2] not in exploredSet:
+            # print('Exploring:', node[1], 'at cost', node[0])
+            exploredSet.add(node[2])
+            for child in problem.getSuccessors(node[2]):
+                heappush(frontier,
+                         (node[0] + child[2] - heuristic(node[2], problem) + heuristic(child[0], problem),
+                          node[1] + [child[1]],
+                          child[0]))
+            # print(list(frontier))
+
+    # util.raiseNotDefined()
 
 # Abbreviations
 bfs = breadthFirstSearch

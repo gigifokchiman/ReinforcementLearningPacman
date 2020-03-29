@@ -2,6 +2,7 @@ import random
 import copy
 from optparse import OptionParser
 import util
+import numpy as np
 
 class SolveEightQueens:
     def __init__(self, numberOfRuns, verbose, lectureExample):
@@ -44,7 +45,7 @@ class SolveEightQueens:
             currentNumberOfAttacks = newBoard.getNumberOfAttacks()
             (newBoard, newNumberOfAttacks, newRow, newCol) = newBoard.getBetterBoard()
             i += 1
-            if currentNumberOfAttacks <= newNumberOfAttacks:
+            if currentNumberOfAttacks < newNumberOfAttacks or newNumberOfAttacks == 0 or i >= 100:
                 break
         return newBoard
 
@@ -104,7 +105,30 @@ class Board:
             return (betterBoard, minNumOfAttack, newRow, newCol)
         The datatype of minNumOfAttack, newRow and newCol should be int
         """
-        util.raiseNotDefined()
+
+        costboard = self.getCostBoard().toString(True)
+        rows = costboard.split("\n")
+        rows = [r.strip().split() for r in rows if r.strip().split()]
+        np_arr = np.asarray(rows)
+        np_arr[np_arr == "q"] = 999
+        np_arr = np_arr.astype(np.int)
+        minNumOfAttack = np.min(np_arr[np_arr != 999])
+        row_idx, col_idx = np.where(np_arr == minNumOfAttack)
+
+        pick = np.random.randint(len(row_idx), size=1)
+
+        newRow = row_idx[pick][0]
+        newCol = col_idx[pick][0]
+        betterBoard = copy.deepcopy(self.squareArray)
+
+        for i in range(8):
+            betterBoard[i][newCol] = 0
+
+        betterBoard[newRow][newCol] = 1
+
+        return (Board(betterBoard), minNumOfAttack, newRow, newCol)
+
+        # util.raiseNotDefined()
 
     def getNumberOfAttacks(self):
         """
@@ -112,7 +136,18 @@ class Board:
         This function should return the number of attacks of the current board
         The datatype of the return value should be int
         """
-        util.raiseNotDefined()
+
+        n = len(self.squareArray)
+        sum1 = sum([((sum(i)-1) * sum(i))/2 for i in zip(*self.squareArray)])
+        sum2 = sum([((sum(i)-1) * sum(i))/2 for i in self.squareArray])
+        shift_1 = [[0]*i + val + [0]*(n-i-1) for i, val in enumerate(self.squareArray)]
+        sum3 = sum([((sum(i)-1) * sum(i))/2 for i in zip(*shift_1)])
+        shift_2 = [[0]*(n-i-1) + val + [0]*i for i, val in enumerate(self.squareArray)]
+        sum4 = sum([((sum(i)-1) * sum(i))/2 for i in zip(*shift_2)])
+
+        return int(sum1 + sum2 + sum3 + sum4)
+
+        # util.raiseNotDefined()
 
 if __name__ == "__main__":
     #Enable the following line to generate the same random numbers (useful for debugging)
