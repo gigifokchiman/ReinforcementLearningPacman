@@ -26,6 +26,9 @@ import util
 import time
 import search
 import numpy as np
+from itertools import combinations
+from copy import deepcopy
+
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -343,10 +346,16 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     # manhattan distance to the closest path
-    if len(state[1]) > 0:
-       h = min([abs(x[0] - state[0][0]) + abs(x[1] - state[0][1]) for x in state[1]])
-    else:
-       h = 0
+
+    h = 0
+    remaining_points = list(deepcopy(state[1]))
+    current_point = state[0]
+    while len(remaining_points) > 0:
+        # find min distance for the next points
+        distance = [abs(x[0] - current_point[0]) + abs(x[1] - current_point[1]) for x in remaining_points]
+        h += min(distance)
+        current_point = remaining_points[np.argmin(distance)]
+        remaining_points.remove(current_point)
 
 
     # if len(state[1]) > 0:

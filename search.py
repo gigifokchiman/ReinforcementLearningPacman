@@ -167,14 +167,12 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     while frontier:
         node = heappop(frontier)
         if problem.isGoalState(node[2]):
-            print(len(exploredSet))
             return node[1]
 
 
         if node[2] not in exploredSet:
             # print('Exploring:', node[1], 'at cost', node[0])
             exploredSet.add(node[2])
-            print(node[2])
             for child in problem.getSuccessors(node[2]):
                 heappush(frontier,
                          (node[0] + child[2] - heuristic(node[2], problem) + heuristic(child[0], problem),
