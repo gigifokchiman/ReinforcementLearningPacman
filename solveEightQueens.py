@@ -112,13 +112,13 @@ class Board:
         np_arr = np.asarray(rows)
         np_arr[np_arr == "q"] = 999
         np_arr = np_arr.astype(np.int)
-        minNumOfAttack = np.min(np_arr[np_arr != 999])
+        minNumOfAttack = int(np.min(np_arr[np_arr != 999]))
         row_idx, col_idx = np.where(np_arr == minNumOfAttack)
 
         pick = np.random.randint(len(row_idx), size=1)
 
-        newRow = row_idx[pick][0]
-        newCol = col_idx[pick][0]
+        newRow = int(row_idx[pick][0])
+        newCol = int(col_idx[pick][0])
         betterBoard = copy.deepcopy(self.squareArray)
 
         for i in range(8):

@@ -497,7 +497,7 @@ class QueenGetBetterBoard(testClasses.TestCase):
         #print(squareArray)
         Board = board(squareArray)
         oldNumOfAttack = Board.getNumberOfAttacks()
-        (newBoard, minNumOfAttack, newRow, newCol) = Board.getBetterBoard() 
+        (newBoard, minNumOfAttack, newRow, newCol) = Board.getBetterBoard()
         if type(newBoard) != type(Board):
             return None, 'The return value of board must be a %s. (Instead. it is %s)' % (type(newBoard), type(Board))
         if type(newRow) != int or type(newCol) != int:
@@ -513,11 +513,13 @@ class QueenGetBetterBoard(testClasses.TestCase):
         testBoard = board(testSquareArray)
         testMinNumOfAttack = testBoard.getNumberOfAttacks()
         #testCostBoard = testBoard.getCostBoard.toString()
+
         return (minNumOfAttack, testMinNumOfAttack, newBoard.toString(), testBoard.toString(), newRow, newCol, oldNumOfAttack), None
 
     def execute(self, grades, moduleDict, solutionDict):
         solveEightQueens = moduleDict['solveEightQueens']
         (minNumOfAttack, testMinNumOfAttack, newBoardLayout, testBoardLayout, newRow, newCol, oldNumOfAttack), error = self.getSolInfo(solveEightQueens)
+
         goal_minNumOfAttack = solutionDict['minNumOfAttack']
         if error != None:
             grades.addMessage('FAIL: %s' % self.path)
