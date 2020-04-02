@@ -505,7 +505,7 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
     # currNode = problem.startingGameState
-    foodList = list(foodGrid.asList())
+    foodList = [(x, y) for x, sublist in enumerate(foodGrid) for y, val in enumerate(sublist) if val == 1]
 
     #foodList2 = []
     # if len(foodList) > 1:
@@ -529,24 +529,117 @@ def foodHeuristic(state, problem):
 
     # return len(foodGrid.asList())
     #
-    h = 0
-    # convert the matrix into a list of coordintes
-    remaining_points = deepcopy(foodList)
+    # h = 0
+    # # convert the matrix into a list of coordintes
+    # remaining_points = deepcopy(foodList)
+    #
+    # current_point = state[0]
+    # i = 0
+    #
+    # if len(foodList) > 2:
+    #     while i < 2:
+    #         # find min distance for the next points
+    #         distance = [abs(x[0] - current_point[0]) + abs(x[1] - current_point[1]) for x in remaining_points]
+    #         h += min(distance)
+    #         current_point = remaining_points[np.argmin(distance)]
+    #         remaining_points.remove(current_point)
+    #         i += 1
+    #         return h + len(foodList) - 2
+    # else:
+    #     return len(foodList)
 
+    # pacmanPosition, foodGrid = state
+    # maxDistance = 0
+    # minDistance = 0
+    # for foodPosition in foodGrid.asList():
+    #     xy1 = foodPosition
+    #     xy2 = pacmanPosition
+    #     # distance = myMazeDistance(xy1, xy2, problem)
+    #     distance = (abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1]))
+    #
+    #     if distance > maxDistance:
+    #         maxDistance = distance
+    #     if distance < maxDistance:
+    #         minDistance = distance
+    #
+    # if len(foodGrid.asList()) > 1:
+    #     return maxDistance + minDistance
+    # else:
+    #     return maxDistance
+
+    #
+    # H = 0
+    # maxDistance = 0
+    # # find the farthest distance by Astar search using mazeDistance() function.
+    # for y in range(foodGrid.height):
+    #     for x in range(foodGrid.width):
+    #         if (foodGrid[x][y] == 1) and (mazeDistance(position,(x,y),problem.startingGameState) > maxDistance):
+    #             maxDistance = mazeDistance(position,(x,y),problem.startingGameState)
+    # H = maxDistance
+    # return H
+    #
+    # h = 0
+    # # convert the matrix into a list of coordintes
+    # remaining_points = deepcopy(foodList)
+    #
+    # current_point = state[0]
+    # i = 0
+    #
+    # if len(foodList) > 2:
+    #     while i < 2:
+    #         # find min distance for the next points
+    #         distance = [abs(x[0] - current_point[0]) + abs(x[1] - current_point[1]) for x in remaining_points]
+    #         h += min(distance)
+    #         current_point = remaining_points[np.argmin(distance)]
+    #         remaining_points.remove(current_point)
+    #         i += 1
+    #         return h + len(foodList) - 2
+    # else:
+    #     return len(foodList)
+
+    # h = 0
+    # # convert the matrix into a list of coordintes
+    # remaining_points = deepcopy(foodList)
+    #
     current_point = state[0]
-    i = 0
+    # i = 0
+    #
+    # if len(foodList) > 2:
+    #     while i < 2:
+    #         # find min distance for the next points
+    #         distance = [abs(x[0] - current_point[0]) + abs(x[1] - current_point[1]) for x in remaining_points]
+    #         h += min(distance)
+    #         current_point = remaining_points[np.argmin(distance)]
+    #         remaining_points.remove(current_point)
+    #         i += 1
+    #         return h + len(foodList) - 2
+    # else:
+    #     return len(foodList)
 
-    if len(foodList) > 2:
-        while i < 2:
-            # find min distance for the next points
-            distance = [abs(x[0] - current_point[0]) + abs(x[1] - current_point[1]) for x in remaining_points]
-            h += min(distance)
-            current_point = remaining_points[np.argmin(distance)]
-            remaining_points.remove(current_point)
-            i += 1
-            return h + len(foodList) - 2
+    #print(problem.walls)
+    print("=============")
+    print(foodGrid)
+    print("--------------")
+    print(current_point)
+    if len(foodList) >= 2:
+        comb_points = list(combinations(foodList, 2))
+
+        distance = [(abs(x[0] - y[0]) + abs(x[1] - y[1])) for x, y in comb_points]
+        h = max(distance)
+        max_point = comb_points[int(np.argmax(distance))]
+
+        # print(max_point)
+        distance_1 = [abs(x[0] - current_point[0]) + abs(x[1] - current_point[1]) for x in max_point]
+
+        print(h)
+        print(min(distance_1))
+
+        return min(distance_1) + h
+    elif len(foodList) == 1:
+        return min([abs(x[0] - current_point[0]) + abs(x[1] - current_point[1]) for x in foodList])
     else:
-        return len(foodList)
+        return 0
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
