@@ -504,9 +504,49 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
+    # currNode = problem.startingGameState
+    foodList = list(foodGrid.asList())
 
+    #foodList2 = []
+    # if len(foodList) > 1:
+    #     for foodA in foodList:
+    #         foodList2.append(max([(mazeDistance(foodA, foodB, currNode), foodA, foodB) for foodB in foodList]))
+    #
+    #     foodList3 = max(foodList2)
+    #     AtoB = foodList3[0]
+    #     pacToA = mazeDistance(position, foodList3[1], currNode)
+    #     pacToB = mazeDistance(position, foodList3[2], currNode)
+    #
+    #     if pacToA < pacToB:
+    #         return pacToA + AtoB
+    #     else:
+    #         return pacToB + AtoB
+    # elif len(foodList) == 1:
+    #     food = foodList[0]
+    #     return abs( position[0] - food[0] ) + abs( position[1] - food[1] )
+    # else:
+    #     return 0
 
-    return 0
+    # return len(foodGrid.asList())
+    #
+    h = 0
+    # convert the matrix into a list of coordintes
+    remaining_points = deepcopy(foodList)
+
+    current_point = state[0]
+    i = 0
+
+    if len(foodList) > 2:
+        while i < 2:
+            # find min distance for the next points
+            distance = [abs(x[0] - current_point[0]) + abs(x[1] - current_point[1]) for x in remaining_points]
+            h += min(distance)
+            current_point = remaining_points[np.argmin(distance)]
+            remaining_points.remove(current_point)
+            i += 1
+            return h + len(foodList) - 2
+    else:
+        return len(foodList)
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
