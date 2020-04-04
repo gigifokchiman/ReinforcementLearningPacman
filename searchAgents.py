@@ -26,9 +26,7 @@ import util
 import time
 import search
 import numpy as np
-from itertools import combinations
 from copy import deepcopy
-
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -272,11 +270,10 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0 # Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
-        "*** YOUR CODE HERE ***"
 
+        "*** YOUR CODE HERE ***"
         self.allgoals = tuple([x for x in self.corners if startingGameState.hasFood(*x)])
         self.start = (startingGameState.getPacmanPosition(), self.allgoals)
-
 
     def getStartState(self):
         "Returns the start state (in your state space, not the full Pacman state space)"
@@ -309,9 +306,8 @@ class CornersProblem(search.SearchProblem):
             dx, dy = Actions.directionToVector(direction)
             nextx, nexty = int(x + dx), int(y + dy)
             if not self.walls[nextx][nexty]:
-                nextState = tuple([x for x in state[1] if x != (nextx, nexty)])
-
-                successors.append((((nextx, nexty), nextState), direction, 1))
+                next_state = tuple([x for x in state[1] if x != (nextx, nexty)])
+                successors.append((((nextx, nexty), next_state), direction, 1))
 
         return successors
         # util.raiseNotDefined()
@@ -342,10 +338,9 @@ def cornersHeuristic(state, problem):
     on the shortest path from the state to a goal of the problem; i.e.
     it should be admissible (as well as consistent).
     """
-    corners = problem.corners # These are the corner coordinates
-    walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-
-    # manhattan distance to the closest path
+    # corners = problem.corners # These are the corner coordinates
+    # walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+    # sum of distance to the closest point until all points are visited.
 
     h = 0
     remaining_points = list(deepcopy(state[1]))
@@ -354,66 +349,10 @@ def cornersHeuristic(state, problem):
         # find min distance for the next points
         distance = [abs(x[0] - current_point[0]) + abs(x[1] - current_point[1]) for x in remaining_points]
         h += min(distance)
-        current_point = remaining_points[np.argmin(distance)]
+        current_point = remaining_points[int(np.argmin(distance))]
         remaining_points.remove(current_point)
 
-
-    # if len(state[1]) > 0:
-    #     distance = [abs(x[0] - state[0][0]) + abs(x[1] - state[0][1]) for x in state[1]]
-    #     min_distance = min(distance)
-    #
-    #     for i, val in enumerate(distance):
-    #         print(i)
-    #         print(state[1][i])
-    #         print(state[0])
-    #
-    #         if val == min_distance:
-    #             add_h = 2
-    #             corrd_1 = (min(state[1][i][0], state[0][0]), min(state[1][i][1], state[0][1]))
-    #             corrd_2 = (max(state[1][i][0], state[0][0]), max(state[1][i][1], state[0][1]))
-    #             npwalls = np.asarray(walls)
-    #
-    #             print(corrd_1)
-    #             print(corrd_2)
-    #             print(npwalls)
-    #             npwalls_slice = npwalls[corrd_1[0]:corrd_2[0], corrd_1[1]:corrd_2]
-    #
-    #             print("-----------")
-    #
-    #
-    #             print(npwalls_slice)
-    #
-    #
-    #             len_x = corrd_2[0] - corrd_1[0] + 1
-    #             len_y = corrd_2[1] - corrd_1[1] + 1
-    #
-    #             print(len_x)
-    #             print(len_y)
-    #
-    #             print([sum(i) == len_x for i in npwalls_slice])
-    #             print([sum(i) == len_y for i in zip(*npwalls_slice)])
-    #
-    #             if sum([sum(i) == len_x for i in npwalls_slice]) == 0 and \
-    #                 sum([sum(i) == len_y for i in zip(* npwalls_slice)]) == 0:
-    #                 add_h = 0
-    #                 break
-    #
-    #
-    #     h = min(distance) + add_h
-
-        # penality if the region enclosed by the closest point
-        # has a long wall which divides the region into 2 retangles.
-        #
-
-
-    # else:
-    #     h = 0
-
-
-
-
     return h
-    # return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -504,9 +443,9 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    foodList = [(x, y) for x, sublist in enumerate(foodGrid) for y, val in enumerate(sublist) if val == 1]
+    food_list = [(x, y) for x, sublist in enumerate(foodGrid) for y, val in enumerate(sublist) if val == 1]
 
-    distance = [mazeDistance(position, point, problem.startingGameState) for point in foodList]
+    distance = [mazeDistance(position, point, problem.startingGameState) for point in food_list]
 
     if len(distance) > 0:
         return max(distance)

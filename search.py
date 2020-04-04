@@ -78,7 +78,7 @@ def depthFirstSearch(problem):
 
     frontier = collections.deque()
     frontier.append((problem.getStartState(), []))
-    exploredSet = set()
+    explored_set = set()
 
     while frontier:
         node = frontier.pop()
@@ -86,9 +86,9 @@ def depthFirstSearch(problem):
         if problem.isGoalState(node[0]):
             return node[1]
 
-        if node[0] not in exploredSet:
+        if node[0] not in explored_set:
             # print('Exploring:', node[0], '...')
-            exploredSet.add(node[0])
+            explored_set.add(node[0])
 
             for child in problem.getSuccessors(node[0]):
                 frontier.append((child[0], node[1] + [child[1]]))
@@ -106,7 +106,7 @@ def breadthFirstSearch(problem):
 
     frontier = collections.deque()
     frontier.append((problem.getStartState(), []))
-    exploredSet = set()
+    explored_set = set()
 
     while frontier:
         node = frontier.popleft()
@@ -114,9 +114,9 @@ def breadthFirstSearch(problem):
         if problem.isGoalState(node[0]):
             return node[1]
 
-        if node[0] not in exploredSet:
+        if node[0] not in explored_set:
             # print('Exploring:', node[0], '...')
-            exploredSet.add(node[0])
+            explored_set.add(node[0])
 
             for child in problem.getSuccessors(node[0]):
                 frontier.append((child[0], node[1] + [child[1]]))
@@ -132,16 +132,16 @@ def uniformCostSearch(problem):
 
     frontier = []
     heappush(frontier, (0, [], problem.getStartState()))
-    exploredSet = set()
+    explored_set = set()
 
     while frontier:
         node = heappop(frontier)
         if problem.isGoalState(node[2]):
             return node[1]
 
-        if node[2] not in exploredSet:
+        if node[2] not in explored_set:
             # print('Exploring:', node[1], 'at cost', node[0])
-            exploredSet.add(node[2])
+            explored_set.add(node[2])
             for child in problem.getSuccessors(node[2]):
                 heappush(frontier, (node[0]+child[2], node[1]+[child[1]], child[0]))
 
@@ -162,17 +162,16 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     frontier = []
     heappush(frontier, (heuristic(problem.getStartState(), problem),  [], problem.getStartState()))
-    exploredSet = set()
+    explored_set = set()
 
     while frontier:
         node = heappop(frontier)
         if problem.isGoalState(node[2]):
             return node[1]
 
-
-        if node[2] not in exploredSet:
+        if node[2] not in explored_set:
             # print('Exploring:', node[1], 'at cost', node[0])
-            exploredSet.add(node[2])
+            explored_set.add(node[2])
             for child in problem.getSuccessors(node[2]):
                 heappush(frontier,
                          (node[0] + child[2] - heuristic(node[2], problem) + heuristic(child[0], problem),
