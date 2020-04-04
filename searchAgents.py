@@ -504,52 +504,14 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    # currNode = problem.startingGameState
     foodList = [(x, y) for x, sublist in enumerate(foodGrid) for y, val in enumerate(sublist) if val == 1]
 
-    # pacmanPosition, foodGrid = state
-    # maxDistance = 0
-    # minDistance = 0
-    # for foodPosition in foodGrid.asList():
-    #     xy1 = foodPosition
-    #     xy2 = pacmanPosition
-    #     # distance = myMazeDistance(xy1, xy2, problem)
-    #     distance = (abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1]))
-    #
-    #     if distance > maxDistance:
-    #         maxDistance = distance
-    #     if distance < maxDistance:
-    #         minDistance = distance
-    #
-    # if len(foodGrid.asList()) > 1:
-    #     return maxDistance + minDistance
-    # else:
-    #     return maxDistance
+    distance = [mazeDistance(position, point, problem.startingGameState) for point in foodList]
 
-    # H = 0
-    # maxDistance = 0
-    # # find the farthest distance by Astar search using mazeDistance() function.
-    # for y in range(foodGrid.height):
-    #     for x in range(foodGrid.width):
-    #         if (foodGrid[x][y] == 1) and (mazeDistance(position,(x,y),problem.startingGameState) > maxDistance):
-    #             maxDistance = mazeDistance(position,(x,y),problem.startingGameState)
-    # H = maxDistance
-    # return H
-
-    current_point = state[0]
-
-    # if len(foodList) >= 2:
-    #     comb_points = list(combinations(foodList, 2))
-    #     distance = [(abs(x[0] - y[0]) + abs(x[1] - y[1])) for x, y in comb_points]
-    #     max_point = comb_points[int(np.argmax(distance))]
-    #     distance_1 = [abs(x[0] - current_point[0]) + abs(x[1] - current_point[1]) for x in max_point]
-    #     return min(distance_1) + max(distance)
-    #
-    # elif len(foodList) == 1:
-    #     return min([abs(x[0] - current_point[0]) + abs(x[1] - current_point[1]) for x in foodList])
-    # else:
-    #     return 0
-
+    if len(distance) > 0:
+        return max(distance)
+    else:
+        return 0
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"

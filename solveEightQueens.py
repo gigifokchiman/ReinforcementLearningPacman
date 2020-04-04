@@ -47,6 +47,7 @@ class SolveEightQueens:
             i += 1
             if currentNumberOfAttacks < newNumberOfAttacks or newNumberOfAttacks == 0 or i >= 100:
                 break
+
         return newBoard
 
 class Board:
