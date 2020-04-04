@@ -35,7 +35,8 @@ class SolveEightQueens:
         Hint: Modify the stop criterion in this function
         """
         newBoard = board
-        i = 0 
+        i = 0
+        con_moves = 0
         while True:
             if verbose:
                 print("iteration %d" % i)
@@ -118,16 +119,16 @@ class Board:
 
         pick = np.random.randint(len(row_idx), size=1)
 
-        newRow = int(row_idx[pick][0])
-        newCol = int(col_idx[pick][0])
+        new_row = int(row_idx[pick][0])
+        new_col = int(col_idx[pick][0])
         betterBoard = copy.deepcopy(self.squareArray)
 
         for i in range(8):
-            betterBoard[i][newCol] = 0
+            betterBoard[i][new_col] = 0
 
-        betterBoard[newRow][newCol] = 1
+        betterBoard[new_row][new_col] = 1
 
-        return (Board(betterBoard), minNumOfAttack, newRow, newCol)
+        return (Board(betterBoard), minNumOfAttack, new_row, new_col)
 
         # util.raiseNotDefined()
 
