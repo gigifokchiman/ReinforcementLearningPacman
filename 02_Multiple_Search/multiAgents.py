@@ -145,7 +145,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
             return min(action_value)
 
 
-
     def getAction(self, gameState):
         """
           Returns the minimax action from the current gameState using self.depth
@@ -173,7 +172,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
         return self.maxmin_value(gameState, 0, 0)
 
         # util.raiseNotDefined()
-
 
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
@@ -250,33 +248,35 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       Your expectimax agent (question 4)
     """
 
-     # def expectimax_value(self, gameState, agentIndex, curDepth):
-    #     if curDepth == self.depth or gameState.isWin() or gameState.isLose():
-    #         return self.evaluationFunction(gameState)
-    #
-    #     if agentIndex + 1 == gameState.getNumAgents():
-    #         nextAgent = 0
-    #         nextDepth = curDepth + 1
-    #     else:
-    #         nextAgent = agentIndex + 1
-    #         nextDepth = curDepth
-    #
-    #     action_value = [self.expectimax_value(gameState.generateSuccessor(agentIndex, agentAction),
-    #                                    nextAgent,
-    #                                    nextDepth)
-    #                     for agentAction in gameState.getLegalActions(agentIndex)]
-    #
-    #
-    #     if self.index == agentIndex:
-    #         if curDepth == 0:
-    #             return gameState.getLegalActions()[int(np.argmax(action_value))]
-    #         else:
-    #             return max(action_value)
-    #     else:
-    #         n = len(gameState.getLegalActions(agentIndex))
-    #
-    #         return float(sum(action_value)/ n)
-    #
+    def expectimax_value(self, gameState, agentIndex, curDepth):
+        if curDepth == self.depth or gameState.isWin() or gameState.isLose():
+            return self.evaluationFunction(gameState)
+
+        if agentIndex + 1 == gameState.getNumAgents():
+            nextAgent = 0
+            nextDepth = curDepth + 1
+        else:
+            nextAgent = agentIndex + 1
+            nextDepth = curDepth
+
+        actions_available = gameState.getLegalActions(agentIndex)
+
+        action_value = [self.expectimax_value(gameState.generateSuccessor(agentIndex, agentAction),
+                                       nextAgent,
+                                       nextDepth)
+                        for agentAction in actions_available]
+
+        if self.index == agentIndex:
+            if curDepth == 0:
+                return actions_available[int(np.argmax(action_value))]
+
+            else:
+                return max(action_value)
+        else:
+            n = len(actions_available)
+            prob = np.ones(n)/ n
+            return sum([a * b for a, b in zip(prob, action_value)])
+
     def getAction(self, gameState):
         """
           Returns the expectimax action using self.depth and self.evaluationFunction
@@ -285,59 +285,8 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           The expectimax function returns a tuple of (actions,
         """
         "*** YOUR CODE HERE ***"
-        # calling expectimax with the depth we are going to investigate
-        maxDepth = self.depth * gameState.getNumAgents()
-        return self.expectimax(gameState, "expect", maxDepth, 0)[0]
 
-    def expectimax(self, gameState, action, depth, agentIndex):
-
-        if depth is 0 or gameState.isLose() or gameState.isWin():
-            return (action, self.evaluationFunction(gameState))
-
-        # if pacman (max agent) - return max successor value
-        if agentIndex is 0:
-            return self.maxvalue(gameState,action,depth,agentIndex)
-        # if ghost (EXP agent) - return probability value
-        else:
-            return self.expvalue(gameState,action,depth,agentIndex)
-
-    def maxvalue(self,gameState,action,depth,agentIndex):
-        bestAction = ("max", -(float('inf')))
-        for legalAction in gameState.getLegalActions(agentIndex):
-            nextAgent = (agentIndex + 1) % gameState.getNumAgents()
-            succAction = None
-            if depth != self.depth * gameState.getNumAgents():
-                succAction = action
-            else:
-                succAction = legalAction
-            succValue = self.expectimax(gameState.generateSuccessor(agentIndex, legalAction),
-                                        succAction,depth - 1,nextAgent)
-            bestAction = max(bestAction,succValue,key = lambda x:x[1])
-        return bestAction
-
-    def expvalue(self,gameState,action,depth,agentIndex):
-        legalActions = gameState.getLegalActions(agentIndex)
-        averageScore = 0
-        propability = 1.0/len(legalActions)
-        for legalAction in legalActions:
-            nextAgent = (agentIndex + 1) % gameState.getNumAgents()
-            bestAction = self.expectimax(gameState.generateSuccessor(agentIndex, legalAction),
-                                         action, depth - 1, nextAgent)
-            averageScore += bestAction[1] * propability
-        return (action, averageScore)
-
-    def getAction(self, gameState):
-        """
-          Returns the expectimax action using self.depth and self.evaluationFunction
-
-          All ghosts should be modeled as choosing uniformly at random from their
-          legal moves.
-        """
-        "*** YOUR CODE HERE ***"
-        # return self.expectimax_value(gameState, 0, 0)
-        # util.raiseNotDefined()
-        maxDepth = self.depth * gameState.getNumAgents()
-        return self.expectimax(gameState, "expect", maxDepth, 0)[0]
+        return self.expectimax_value(gameState, 0, 0)
 
 
 def betterEvaluationFunction(currentGameState):
@@ -360,52 +309,23 @@ def betterEvaluationFunction(currentGameState):
     Capsules = currentGameState.getCapsules()
 
 
-    # "*** YOUR CODE HERE ***"
-    #
-    # food_distance = min([manhattanDistance(food, Pos) for food in Food.asList()])
-    #
-    # ghost_distance = min(
-    #      [manhattanDistance(ghost.getPosition(), Pos) for ghost in currentGameState.getGhostStates()])
-    # capsule_distance = min(
-    #      [manhattanDistance(cap, Pos) for cap in Capsules])
-    # # if ghost_distance < 2 or Directions.STOP in action:
-    # #     return -99999
-    # # else:
-    # actions = currentGameState.getLegalActions()
+    "*** YOUR CODE HERE ***"
 
+    food_distance = [manhattanDistance(food, Pos) for food in Food.asList()]
+    capsule_distance = [manhattanDistance(cap, Pos) for cap in Capsules]
+    target = (food_distance + capsule_distance)
+    target.sort()
 
-    # return currentGameState.getScore() + 1/(food_distance + 1)
+    #food_distance.sort()
+    target_discounted = sum([value * pow(0.5, key) for key, value in enumerate(food_distance)])
 
-    # Useful information you can extract from a GameState (pacman.py)
-    newPos = currentGameState.getPacmanPosition()
-    newFood = currentGameState.getFood().asList()
+    ghost_distance = min(
+         [manhattanDistance(ghost.getPosition(), Pos) for ghost in currentGameState.getGhostStates()])
 
-    minFoodist = float('inf')
-    for food in newFood:
-        minFoodist = min(minFoodist, manhattanDistance(newPos, food))
-
-    ghostDist = 0
-    for ghost in currentGameState.getGhostPositions():
-        ghostDist = manhattanDistance(newPos, ghost)
-        if (ghostDist < 2):
-            return -float('inf')
-
-    foodLeft = currentGameState.getNumFood()
-    capsLeft = len(currentGameState.getCapsules())
-
-    foodLeftMultiplier = 950050
-    capsLeftMultiplier = 10000
-    foodDistMultiplier = 950
-
-    additionalFactors = 0
-    if currentGameState.isLose():
-        additionalFactors -= 50000
-    elif currentGameState.isWin():
-        additionalFactors += 50000
-
-    return 1.0/(foodLeft + 1) * foodLeftMultiplier + ghostDist + \
-           1.0/(minFoodist + 1) * foodDistMultiplier + \
-           1.0/(capsLeft + 1) * capsLeftMultiplier + additionalFactors
+    if ghost_distance < 2:
+        return -99999
+    else:
+        return currentGameState.getScore() - target_discounted - len(Capsules) * 10
 
 
 # util.raiseNotDefined()

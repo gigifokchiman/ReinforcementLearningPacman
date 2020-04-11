@@ -1,5 +1,0 @@
-class: "QueenSearch"
-agent: "SolveEightQueens"
-
-representation: "Board"
-iteration: "30"

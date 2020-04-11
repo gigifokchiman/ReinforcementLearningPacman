@@ -140,8 +140,36 @@ class TicTacToeAgent():
         {}
 
     def getAction(self, gameState, gameRules):
-        util.raiseNotDefined()
 
+        actions = gameState.getLegalActions(gameRules)
+
+
+
+    # def maxmin_value(self, gameState, agentIndex, curDepth):
+    #
+    #     if curDepth == self.depth or gameState.isWin() or gameState.isLose():
+    #         return self.evaluationFunction(gameState)
+    #
+    #     if agentIndex + 1 == gameState.getNumAgents():
+    #         nextAgent = 0
+    #         nextDepth = curDepth + 1
+    #     else:
+    #         nextAgent = agentIndex + 1
+    #         nextDepth = curDepth
+    #
+    #     action_value = [self.maxmin_value(gameState.generateSuccessor(agentIndex, agentAction),
+    #                                       nextAgent,
+    #                                       nextDepth)
+    #                     for agentAction in gameState.getLegalActions(agentIndex)]
+    #
+    #     if self.index == agentIndex:
+    #         if curDepth == 0:
+    #             return gameState.getLegalActions()[int(np.argmax(action_value))]
+    #         else:
+    #             return max(action_value)
+    #     else:
+    #         return min(action_value)
+    #
 
 class randomAgent():
     """
