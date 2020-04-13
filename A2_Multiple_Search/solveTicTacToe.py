@@ -1,34 +1,36 @@
-#############################################################################
+#################################################################################
 #     File Name           :     solveTicTacToe.py
-#     Created By          :     Chen Guanying 
+#     Created By          :     Chen Guanying
 #     Creation Date       :     [2017-03-18 19:17]
 #     Last Modified       :     [2017-03-18 19:17]
-#     Description         :      
+#     Description         :
 #################################################################################
 
 import copy
-import util 
+import util
 import sys
 import random
 import time
 from optparse import OptionParser
 import numpy as np
 
+
 class GameState:
     """
       Game state of 3-Board Misere Tic-Tac-Toe
       You *do not* need to make any changes here, but you can if you want to
-      add functionality to all your search agents. Please do not remove anything, 
+      add functionality to all your search agents. Please do not remove anything,
       however.
     """
+
     def __init__(self):
         """
-          Represent 3 boards with lists of boolean value 
+          Represent 3 boards with lists of boolean value
           True stands for X in that position
         """
         self.boards = [[False, False, False, False, False, False, False, False, False],
-                        [False, False, False, False, False, False, False, False, False],
-                        [False, False, False, False, False, False, False, False, False]]
+                       [False, False, False, False, False, False, False, False, False],
+                       [False, False, False, False, False, False, False, False, False]]
 
     def generateSuccessor(self, action):
         """
@@ -46,7 +48,7 @@ class GameState:
     def getLegalActions(self, gameRules):
         """
           Input: GameRules
-          Output: Legal Actions (Actions not in dead board) 
+          Output: Legal Actions (Actions not in dead board)
         """
         ASCII_OF_A = 65
         actions = []
@@ -54,7 +56,7 @@ class GameState:
             if gameRules.deadTest(self.boards[b]): continue
             for i in range(9):
                 if not self.boards[b][i]:
-                    actions.append( chr(b+ASCII_OF_A) + str(i) )
+                    actions.append(chr(b + ASCII_OF_A) + str(i))
         return actions
 
     # Print living boards
@@ -74,7 +76,7 @@ class GameState:
                 if row == 0: boardTitle += titles[boardIndex] + "      "
                 for i in range(3):
                     index = 3 * row + i
-                    if self.boards[boardIndex][index]: 
+                    if self.boards[boardIndex][index]:
                         boardsString += "X "
                     else:
                         boardsString += str(index) + " "
@@ -83,18 +85,20 @@ class GameState:
         print(boardTitle)
         print(boardsString)
 
+
 class GameRules:
     """
-      This class defines the rules in 3-Board Misere Tic-Tac-Toe. 
+      This class defines the rules in 3-Board Misere Tic-Tac-Toe.
       You can add more rules in this class, e.g the fingerprint (patterns).
       However, please do not remove anything.
     """
+
     def __init__(self):
-        """ 
+        """
           You can initialize some variables here, but please do not modify the input parameters.
         """
         {}
-        
+
     def deadTest(self, board):
         """
           Check whether a board is a dead board
@@ -104,86 +108,117 @@ class GameRules:
         if board[2] and board[4] and board[6]:
             return True
         for i in range(3):
-            #check every row
+            # check every row
             row = i * 3
-            if board[row] and board[row+1] and board[row+2]:
+            if board[row] and board[row + 1] and board[row + 2]:
                 return True
-            #check every column
-            if board[i] and board[i+3] and board[i+6]:
+            # check every column
+            if board[i] and board[i + 3] and board[i + 6]:
                 return True
         return False
 
     def isGameOver(self, boards):
         """
-          Check whether the game is over  
+          Check whether the game is over
         """
         return self.deadTest(boards[0]) and self.deadTest(boards[1]) and self.deadTest(boards[2])
 
+
 class TicTacToeAgent():
     """
-      When move first, the TicTacToeAgent should be able to chooses an action to always beat 
+      When move first, the TicTacToeAgent should be able to chooses an action to always beat
       the second player.
 
-      You have to implement the function getAction(self, gameState, gameRules), which returns the 
+      You have to implement the function getAction(self, gameState, gameRules), which returns the
       optimal action (guarantee to win) given the gameState and the gameRules. The return action
-      should be a string consists of a letter [A, B, C] and a number [0-8], e.g. A8. 
+      should be a string consists of a letter [A, B, C] and a number [0-8], e.g. A8.
 
       You are welcome to add more helper functions in this class to help you. You can also add the
       helper function in class GameRules, as function getAction() will take GameRules as input.
-      
-      However, please don't modify the name and input parameters of the function getAction(), 
+
+      However, please don't modify the name and input parameters of the function getAction(),
       because autograder will call this function to check your algorithm.
     """
+
     def __init__(self):
-        """ 
+        """
           You can initialize some variables here, but please do not modify the input parameters.
         """
         self.pattern_to_score_single = {}
+        none = 1
+        a = 2
+        b = 3
+        c = 5
+        d = 7
 
+        raw_patterns = {
+            # Row 1
+            "000000000": c,
+            "100000000": none,
+            "010000000": none,
+            "000010000": c ** 2,
+            "110000000": a * d,
+            "101000000": b,
+            "100010000": b,
+            "100001000": b,
+            "100000001": a,
+            # Row 2
+            "010100000": a,
+            "010010000": b,
+            "010000010": a,
 
-    def getAction(self, gameState, gameRules):
+            "110100000": b,
+            "110010000": a * b,
+            "110001000": d,
+            "110000100": a,
+            "110000010": d,
+            # Row 3
+            "110000001": d,
+            "101010000": a,
+            "101000100": a * b,
+            "101000010": a,
+            "100011000": a,
 
-        """
-        The target: is to make sure that the game ends with odd number of future moves.
-        What can we do to change if the board with end with odd/even numver of future moves.
-        - change the pattern of single board.
-        - design what board we should change (to kill some board or change its odd/even nature).
+            "100001010": none,
+            "010110000": a * b,
+            "010101000": b,
+            # Row 4
+            "110110000": a,
+            "110101000": a,
+            "110100001": a,
+            "110011000": b,
+            # Row 5
+            "110010100": b,
+            "110001100": b,
+            "110001010": a * b,
+            "110001001": a * b,
+            "110000110": b,
+            "110000101": b,
+            "110000011": a,
+            # Row 6
+            "101010010": b,
+            "101000101": a,
+            "100011010": b,
+            "010101010": a,
+            # Row 1 (p2)
+            "110101001": b,
+            "110011100": a,
+            "110001110": a,
+            "110001101": a,
+            "110101011": a,
 
-        In theory, we could try every combinations but it will definitely run out of time.
+            "110101010": b
+        }
 
-        The video below has simplified the game using 2 layers of template matching
-        - the first layer: (A) the cross pattern ---> (B) whether the board could be ended with odd/even number of moves.
-        - the second layer: (B) --> (B) final winning condition of the game
+        raw_patterns = {
+            str([True if d == "1" else False for d in k]): v
+            for k, v in raw_patterns.items()
+        }
 
-        https://www.youtube.com/watch?v=h09XU8t8eUM
-
-        For this exercise, I am not going to use template matching.
-        First, the machine could not afford to evaluate all actions of 3 boards jointly but
-        could afford the computation of 3 separate boards within the time limit. We don't need
-        to use the 1st layer of template matching and we could apply what we learn in the multiple agent problem.
-
-        For the second layer, we could model the reward with a similar manner so the agent will know what to do next.
-
-        # max score: 8; this is the early stopping condition to save time"
-        # Step 1: to evaluate the score if there is no move"
-        # Step 2: to evaluate the score if there is one move
-
-        """
-
-        # Step 1: pre-trained the score of a single board  -> serve as hueristic
-        # could be saved for future use; for the assignment purpose, I won't save it.
-
-        self.pattern_to_score_single = self.maxmin_value(gameState, gameRules, 0, 0)
-
-        print(self.pattern_to_score_single)
-
-
-    def score_single(self, turns):
-        # AI prefers odd number of future moves.
-        if turns % 2 == 0:
-            return 1
-        else:
-            return -1
+        self.winningpattern = [25, 2, 15, 9]
+        for k, v in raw_patterns.items():
+            pattern_list = eval(k)
+            self.add_record_all_equivalent(pattern_list, v)
 
     def nested_list_to_string(self, nested_list):
         return str(np.hstack(nested_list))
@@ -222,73 +257,46 @@ class TicTacToeAgent():
         board_nested_3 = self.board_reflect_up_down(board_nested_1, score)
 
         # apply rotation for 3 times per each array
-        for i in range (0, 3):
+        for i in range(0, 3):
             board_nested_0 = self.board_rotation(board_nested_0, score)
             board_nested_1 = self.board_rotation(board_nested_1, score)
             board_nested_2 = self.board_rotation(board_nested_2, score)
             board_nested_3 = self.board_rotation(board_nested_3, score)
 
+    def score(self, gameState, gameRules):
 
-    def maxmin_value(self, gameState, gameRules, turns, boardNum):
+        if gameRules.isGameOver(gameState.boards):
+            return -1
+        else:
+            pattern = 1
+            for board in gameState.boards:
+                if not gameRules.deadTest(board):
+                    pattern *= self.pattern_to_score_single[str(np.hstack(board))]
 
-        print(f"turns:{turns}; boardNum:{boardNum}")
+            if pattern in self.winningpattern:
+                return 1
+            else:
+                return 0
 
-        if gameRules.deadTest(gameState.boards[boardNum]):
-            score = self.score_single(turns)
-            self.add_record_all_equivalent(gameState.boards[boardNum], score)
-            # print(score)
-            # print(self.pattern_to_score_single)
-            return score
-
-        hashed_board = str(np.hstack(gameState.boards[boardNum]))
-        if hashed_board in self.pattern_to_score_single.keys():
-            return self.pattern_to_score_single[hashed_board]
+    def getAction(self, gameState, gameRules):
 
         actions = gameState.getLegalActions(gameRules)
 
-        if boardNum == 0:
-            temp = copy.deepcopy(actions)
-            actions = [action for action in temp if action.startswith("A")]
-
-        print(f"turns:{turns}; boardNum:{boardNum}; actions:")
-        # print(actions)
-
-        action_value = [self.maxmin_value(gameState.generateSuccessor(action),
-                                          gameRules, turns + 1, boardNum)
+        action_value = [self.score(gameState.generateSuccessor(action), gameRules)
                         for action in actions]
 
-        if turns % 2 == 0:
-            if turns == 0:
-                # TODO
-                print (self.pattern_to_score_single)
-                return 0
-            else:
-                max_val = max(action_value)
-                optimal_action = []
-                for key, val in enumerate(action_value):
-                    if val == max_val:
-                        optimal_action.append(gameState.getLegalActions(gameRules)[key])
-                for action in optimal_action:
-                    self.add_record_all_equivalent(gameState.generateSuccessor(action).boards[boardNum], max_val)
-                return max_val
-        else:
-            min_val = max(action_value)
-            optimal_action = []
-            for key, val in enumerate(action_value):
-                if val == min_val:
-                    optimal_action.append(gameState.getLegalActions(gameRules)[key])
-            for action in optimal_action:
-                self.add_record_all_equivalent(gameState.generateSuccessor(action).boards[boardNum], min_val)
-            return min_val
+        return actions[int(np.argmax(action_value))]
+
 
 class randomAgent():
     """
       This randomAgent randomly choose an action among the legal actions
       You can set the first player or second player to be random Agent, so that you don't need to
       play the game when debugging the code. (Time-saving!)
-      If you like, you can also set both players to be randomAgent, then you can happily see two 
+      If you like, you can also set both players to be randomAgent, then you can happily see two
       random agents fight with each other.
     """
+
     def getAction(self, gameState, gameRules):
         actions = gameState.getLegalActions(gameRules)
         return random.choice(actions)
@@ -299,6 +307,7 @@ class keyboardAgent():
       This keyboardAgent return the action based on the keyboard input
       It will check whether the input actions is legal or not.
     """
+
     def checkUserInput(self, gameState, action, gameRules):
         actions = gameState.getLegalActions(gameRules)
         return action in actions
@@ -308,29 +317,32 @@ class keyboardAgent():
         while not self.checkUserInput(gameState, action, gameRules):
             print("Invalid move, please input again")
             action = input("Your move: ")
-        return action 
+        return action
+
 
 class Game():
     """
       The Game class manages the control flow of the 3-Board Misere Tic-Tac-Toe
     """
+
     def __init__(self, numOfGames, muteOutput, randomAI, AIforHuman):
         """
           Settings of the number of games, whether to mute the output, max timeout
-          Set the Agent type for both the first and second players. 
+          Set the Agent type for both the first and second players.
         """
-        self.numOfGames  = numOfGames
-        self.muteOutput  = muteOutput
-        self.maxTimeOut  = 30 
+        self.numOfGames = numOfGames
+        self.muteOutput = muteOutput
+        self.maxTimeOut = 30
 
-        self.AIforHuman  = AIforHuman
-        self.gameRules   = GameRules()
-        self.AIPlayer    = TicTacToeAgent()
+        self.AIforHuman = AIforHuman
+        self.gameRules = GameRules()
+        self.AIPlayer = TicTacToeAgent()
 
         if randomAI:
             self.AIPlayer = randomAgent()
         else:
             self.AIPlayer = TicTacToeAgent()
+
         if AIforHuman:
             self.HumanAgent = randomAgent()
         else:
@@ -339,21 +351,22 @@ class Game():
     def run(self):
         """
           Run a certain number of games, and count the number of wins
-          The max timeout for a single move for the first player (your AI) is 30 seconds. If your AI 
-          exceed this time limit, this function will throw an error prompt and return. 
+          The max timeout for a single move for the first player (your AI) is 30 seconds. If your AI
+          exceed this time limit, this function will throw an error prompt and return.
         """
         numOfWins = 0;
         for i in range(self.numOfGames):
             gameState = GameState()
-            agentIndex = 0 # 0 for First Player (AI), 1 for Second Player (Human)
+            agentIndex = 0  # 0 for First Player (AI), 1 for Second Player (Human)
             while True:
-                if agentIndex == 0: 
+                if agentIndex == 0:
                     timed_func = util.TimeoutFunction(self.AIPlayer.getAction, int(self.maxTimeOut))
                     try:
                         start_time = time.time()
                         action = timed_func(gameState, self.gameRules)
                     except util.TimeoutFunctionException:
-                        print("ERROR: Player %d timed out on a single move, Max %d Seconds!" % (agentIndex, self.maxTimeOut))
+                        print("ERROR: Player %d timed out on a single move, Max %d Seconds!" % (
+                        agentIndex, self.maxTimeOut))
                         return False
 
                     if not self.muteOutput:
@@ -368,12 +381,12 @@ class Game():
                 if not self.muteOutput:
                     gameState.printBoards(self.gameRules)
 
-                agentIndex  = (agentIndex + 1) % 2
+                agentIndex = (agentIndex + 1) % 2
             if agentIndex == 0:
-                print("****player 2 wins game %d!!****" % (i+1))
+                print("****player 2 wins game %d!!****" % (i + 1))
             else:
                 numOfWins += 1
-                print("****Player 1 wins game %d!!****" % (i+1))
+                print("****Player 1 wins game %d!!****" % (i + 1))
 
         print("\n****Player 1 wins %d/%d games.**** \n" % (numOfWins, self.numOfGames))
 
@@ -387,7 +400,7 @@ if __name__ == "__main__":
       -a: If specified, the second player will be the randomAgent, otherwise, use keyboardAgent
     """
     # Uncomment the following line to generate the same random numbers (useful for debugging)
-    #random.seed(1)  
+    # random.seed(1)
     parser = OptionParser()
     parser.add_option("-n", dest="numOfGames", default=1, type="int")
     parser.add_option("-m", dest="muteOutput", action="store_true", default=False)
