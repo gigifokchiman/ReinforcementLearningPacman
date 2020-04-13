@@ -1,4 +1,4 @@
-#################################################################################
+#############################################################################
 #     File Name           :     solveTicTacToe.py
 #     Created By          :     Chen Guanying 
 #     Creation Date       :     [2017-03-18 19:17]
@@ -138,47 +138,148 @@ class TicTacToeAgent():
         """ 
           You can initialize some variables here, but please do not modify the input parameters.
         """
-        {}
+        self.pattern_to_score_single = {}
+
 
     def getAction(self, gameState, gameRules):
 
-        self.maxmin_value(gameState, gameRules, 0, 0)
+        """
+        The target: is to make sure that the game ends with odd number of future moves.
+        What can we do to change if the board with end with odd/even numver of future moves.
+        - change the pattern of single board.
+        - design what board we should change (to kill some board or change its odd/even nature).
 
-    def maxmin_value(self, gameState, gameRules, agentIndex, curDepth):
+        In theory, we could try every combinations but it will definitely run out of time.
 
-        if gameRules.isGameOver(gameState.boards):
-            if agentIndex == 0:
-                return 1
-            else:
-                return -1
+        The video below has simplified the game using 2 layers of template matching
+        - the first layer: (A) the cross pattern ---> (B) whether the board could be ended with odd/even number of moves.
+        - the second layer: (B) --> (B) final winning condition of the game
 
-        # if curDepth == self.depth or gameState.isWin() or gameState.isLose():
-        #
-        #     return self.evaluationFunction(gameState)
+        https://www.youtube.com/watch?v=h09XU8t8eUM
 
-        if agentIndex + 1 == 2:
-            nextAgent = 0
-            nextDepth = curDepth + 1
+        For this exercise, I am not going to use template matching.
+        First, the machine could not afford to evaluate all actions of 3 boards jointly but
+        could afford the computation of 3 separate boards within the time limit. We don't need
+        to use the 1st layer of template matching and we could apply what we learn in the multiple agent problem.
+
+        For the second layer, we could model the reward with a similar manner so the agent will know what to do next.
+
+        # max score: 8; this is the early stopping condition to save time"
+        # Step 1: to evaluate the score if there is no move"
+        # Step 2: to evaluate the score if there is one move
+
+        """
+
+        # Step 1: pre-trained the score of a single board  -> serve as hueristic
+        # could be saved for future use; for the assignment purpose, I won't save it.
+
+        self.pattern_to_score_single = self.maxmin_value(gameState, gameRules, 0, 0)
+
+        print(self.pattern_to_score_single)
+
+
+    def score_single(self, turns):
+        # AI prefers odd number of future moves.
+        if turns % 2 == 0:
+            return 1
         else:
-            nextAgent = agentIndex + 1
-            nextDepth = curDepth
+            return -1
+
+    def nested_list_to_string(self, nested_list):
+        return str(np.hstack(nested_list))
+
+    def add_dict(self, new_list, score):
+        str = self.nested_list_to_string(new_list)
+        self.pattern_to_score_single[str] = score
+
+    def board_rotation(self, nested_list, score):
+        new_list = list(map(list, zip(*nested_list)))[::-1]
+        self.add_dict(new_list, score)
+        return new_list
+
+    def board_reflect_up_down(self, nested_list, score):
+        new_list = list(nested_list[::-1])
+        self.add_dict(new_list, score)
+        return new_list
+
+    def board_reflect_left_right(self, nested_list, score):
+        new_list = list([row[::-1] for row in nested_list])
+        self.add_dict(new_list, score)
+        return new_list
+
+    def board_to_nested_list(self, board, num, score):
+        new_list = list(map(lambda x: board[num * x:(x + 1) * num], range(num)))
+        self.add_dict(new_list, score)
+        return new_list
+
+    def add_record_all_equivalent(self, board, score):
+        # add records to all equivalent boards
+
+        equivalent_set = {}
+        board_nested_0 = self.board_to_nested_list(board, 3, score)
+        board_nested_1 = self.board_reflect_left_right(board_nested_0, score)
+        board_nested_2 = self.board_reflect_up_down(board_nested_0, score)
+        board_nested_3 = self.board_reflect_up_down(board_nested_1, score)
+
+        # apply rotation for 3 times per each array
+        for i in range (0, 3):
+            board_nested_0 = self.board_rotation(board_nested_0, score)
+            board_nested_1 = self.board_rotation(board_nested_1, score)
+            board_nested_2 = self.board_rotation(board_nested_2, score)
+            board_nested_3 = self.board_rotation(board_nested_3, score)
+
+
+    def maxmin_value(self, gameState, gameRules, turns, boardNum):
+
+        print(f"turns:{turns}; boardNum:{boardNum}")
+
+        if gameRules.deadTest(gameState.boards[boardNum]):
+            score = self.score_single(turns)
+            self.add_record_all_equivalent(gameState.boards[boardNum], score)
+            # print(score)
+            # print(self.pattern_to_score_single)
+            return score
+
+        hashed_board = str(np.hstack(gameState.boards[boardNum]))
+        if hashed_board in self.pattern_to_score_single.keys():
+            return self.pattern_to_score_single[hashed_board]
 
         actions = gameState.getLegalActions(gameRules)
 
+        if boardNum == 0:
+            temp = copy.deepcopy(actions)
+            actions = [action for action in temp if action.startswith("A")]
+
+        print(f"turns:{turns}; boardNum:{boardNum}; actions:")
+        # print(actions)
+
         action_value = [self.maxmin_value(gameState.generateSuccessor(action),
-                                          gameRules,
-                                          nextAgent,
-                                          nextDepth)
+                                          gameRules, turns + 1, boardNum)
                         for action in actions]
 
-        if agentIndex == 0:
-            if curDepth == 0:
-                return gameState.getLegalActions()[int(np.argmax(action_value))]
+        if turns % 2 == 0:
+            if turns == 0:
+                # TODO
+                print (self.pattern_to_score_single)
+                return 0
             else:
-                return max(action_value)
+                max_val = max(action_value)
+                optimal_action = []
+                for key, val in enumerate(action_value):
+                    if val == max_val:
+                        optimal_action.append(gameState.getLegalActions(gameRules)[key])
+                for action in optimal_action:
+                    self.add_record_all_equivalent(gameState.generateSuccessor(action).boards[boardNum], max_val)
+                return max_val
         else:
-            return min(action_value)
-
+            min_val = max(action_value)
+            optimal_action = []
+            for key, val in enumerate(action_value):
+                if val == min_val:
+                    optimal_action.append(gameState.getLegalActions(gameRules)[key])
+            for action in optimal_action:
+                self.add_record_all_equivalent(gameState.generateSuccessor(action).boards[boardNum], min_val)
+            return min_val
 
 class randomAgent():
     """
