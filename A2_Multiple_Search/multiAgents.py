@@ -38,7 +38,6 @@ class ReflexAgent(Agent):
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
         chosenIndex = random.choice(bestIndices)  # Pick randomly among the best
-
         "Add more of your code here if you want to"
 
         return legalMoves[chosenIndex]
@@ -185,9 +184,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
         if curDepth == self.depth or gameState.isWin() or gameState.isLose():
 
-
             return self.evaluationFunction(gameState)
-
 
         if agentIndex + 1 == gameState.getNumAgents():
             nextAgent = 0
