@@ -1,6 +1,7 @@
 "Common code for autograders"
 
 import cgi
+import html
 import time
 import sys
 import json
@@ -245,7 +246,7 @@ Please remember to submit the required files to Moodle before the deadline.
         if self.mute: util.unmutePrint()
         print('*** ' + message)
         if self.mute: util.mutePrint()
-        message = cgi.escape(message)
+        message = html.escape(message)
     self.messages[self.currentQuestion].append(message)
 
   def addMessageToEmail(self, message):
