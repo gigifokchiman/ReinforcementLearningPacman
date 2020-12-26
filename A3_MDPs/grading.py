@@ -253,7 +253,7 @@ Please remember to submit the required files to Moodle before the deadline.
     print("WARNING**** addMessageToEmail is deprecated %s" % message)
     for line in message.split('\n'):
       pass
-      #print '%%% ' + line + ' %%%'K
+      #print '%%% ' + line + ' %%%'
       #self.messages[self.currentQuestion].append(line)
 
 
