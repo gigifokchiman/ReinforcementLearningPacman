@@ -6,10 +6,10 @@ from game import Agent
 import numpy as np
 import sys
 import os
-PACKAGE_PARENT = '../A1_Search'
-SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
-sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
-import searchAgents as sa
+# PACKAGE_PARENT = '../A1_Search'
+# SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+# sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
+# import searchAgents as sa
 
 class ReflexAgent(Agent):
     """
@@ -315,7 +315,6 @@ def betterEvaluationFunction(currentGameState):
 
     #food_distance.sort()
     target_discounted = sum([value * pow(0.5, key) for key, value in enumerate(food_distance)])
-
     ghost_distance = min(
          [manhattanDistance(ghost.getPosition(), Pos) for ghost in currentGameState.getGhostStates()])
 
